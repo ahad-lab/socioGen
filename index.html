@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>socioGen</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+
+  <body>
+    <header>
+      <nav class="navBar">
+        <img src="Assets/Logo - socioGen.png"/>
+        <h1>socioGen</h1>
+        <section id="navMenu">
+          <a class="navlink" href="index.html">HOME</a>
+          <a class="navlink" href="">PROFILE</a>
+          <a href="">Login</a>
+        </section>
+      </nav>
+      <section class="search-section">
+        <form>
+          <input type="text" placeholder="Search" class="searchBox" />
+          <button type="submit" class="searchBtn">
+            <img src="Assets/image.png" alt="Search" />
+          </button>
+        </form>
+      </section>
+    </header>
+
+    <main>
+      <!--------------- Post Box Section --------------->
+      <div class="post-box">
+        <textarea id="postInput" placeholder="What's on your mind?"></textarea>
+        <button onclick="postStatus()">
+          <i class="fas fa-paper-plane"></i> Post
+        </button>
+        <div style="clear: both"></div>
+      </div>
+      <!--------------- Feed Section --------------->
+      <div class="feed" id="feed">
+          <!--------------- Feed --------------->
+        <div class="post">
+          <h3>Person 1</h3>
+          <p>
+            Just finished working on my new web project. Really excited about
+            the launch next week!
+          </p>
+          <div class="post-actions">
+            <button onclick="likePost(this)">
+              <i class="far fa-heart"></i> like
+            </button>
+            <button><i class="far fa-comment"></i> Comment</button>
+            <button><i class="fas fa-share"></i> Share</button>
+          </div>
+        </div>
+
+        <div class="post">
+          <h3>Person 2</h3>
+          <p>
+            Had a great time at the tech conference yesterday. Met so many
+            inspiring people and learned about the latest trends in web
+            development.
+          </p>
+          <div class="post-actions">
+            <button onclick="likePost(this)" class="liked">
+              <i class="fas fa-heart"></i> Liked
+            </button>
+            <button><i class="far fa-comment"></i> Comment</button>
+            <button><i class="fas fa-share"></i> Share</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Major Project socioGen - Connect with the world</p>
+    </footer>
+    <script src="index.js"></script>
+  </body>
+</html>
