@@ -1,8 +1,3 @@
-// // Toggle mobile menu
-// document.getElementById("menuToggle").addEventListener("click", function () {
-//   document.getElementById("navMenu").classList.toggle("active");
-// }); 
-
 // Like post functionality
 function likePost(button) {
   button.classList.toggle("liked");
