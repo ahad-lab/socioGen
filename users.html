@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discover Users - socioGen</title>
+    <script
+      src="https://kit.fontawesome.com/97ebdf5864.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" href="- Logo.png" type="x-icon" />
+    <style>
+      .users-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+
+      .search-container {
+        margin-bottom: 20px;
+        display: flex;
+      }
+
+      .search-container input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px 0 0 4px;
+        font-size: 16px;
+      }
+
+      .search-container button {
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+      }
+
+      .user-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .user-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .user-card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 10px;
+        border: 3px solid var(--primary-color);
+      }
+
+      .user-card h3 {
+        margin: 0 0 5px 0;
+        color: var(--primary-color);
+      }
+
+      .user-card p {
+        margin: 0 0 15px 0;
+        color: var(--text-light);
+        font-size: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .user-card .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .user-card .follow-btn {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .user-card .following-btn {
+        background-color: #ddd;
+        color: #333;
+      }
+
+      .user-card .view-profile-btn {
+        background-color: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="navBar">
+        <img src="- Logo.png" />
+        <h1>socioGen</h1>
+        <section id="navMenu">
+          <a class="navlink" href="index.html">HOME</a>
+          <a class="navlink" href="profile.html">PROFILE</a>
+          <a class="navlink" href="users.html">DISCOVER</a>
+          <a href="Login.html">Login</a>
+        </section>
+      </nav>
+    </header>
+
+    <div class="users-container">
+      <h2>Discover People</h2>
+      <div class="search-container">
+        <input
+          type="text"
+          id="user-search"
+          placeholder="Search by name or email"
+        />
+        <button id="search-button"><i class="fas fa-search"></i> Search</button>
+      </div>
+
+      <div class="user-list" id="user-list">
+        <div style="text-align: center; grid-column: 1 / -1; padding: 20px">
+          <i class="fas fa-spinner fa-spin" style="font-size: 24px"></i>
+          <p>Loading users...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is logged in
+        checkAuthStatus();
+
+        // Load users
+        loadUsers();
+
+        // Add search event listener
+        document
+          .getElementById("search-button")
+          .addEventListener("click", searchUsers);
+        document
+          .getElementById("user-search")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              searchUsers();
+            }
+          });
+      });
+
+      // Function to check authentication status and update UI
+      function checkAuthStatus() {
+        const userData = localStorage.getItem("user");
+
+        if (userData) {
+          const user = JSON.parse(userData);
+
+          // Update navigation for logged-in users
+          const navMenu = document.getElementById("navMenu");
+          if (navMenu.innerHTML.includes('<a href="Login.html">Login</a>')) {
+            navMenu.innerHTML = navMenu.innerHTML.replace(
+              '<a href="Login.html">Login</a>',
+              `<a href="profile.html">${user.name}'s PROFILE</a>
+             <a href="#" id="logoutBtn">LOGOUT</a>`
+            );
+
+            // Add logout functionality
+            document
+              .getElementById("logoutBtn")
+              .addEventListener("click", function (e) {
+                e.preventDefault();
+                localStorage.removeItem("user");
+                window.location.reload();
+              });
+          }
+        }
+      }
+
+      // Function to load all users
+      async function loadUsers() {
+        try {
+          const response = await fetch(
+            "http://localhost:3000/api/users/search?term="
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch users");
+          }
+
+          const users = await response.json();
+          displayUsers(users);
+        } catch (error) {
+          console.error("Error loading users:", error);
+          document.getElementById("user-list").innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 20px;">
+            <p>Error loading users. Please try again later.</p>
+          </div>
+        `;
+        }
+      }
+
+      // Function to search users
+      async function searchUsers() {
+        const searchTerm = document.getElementById("user-search").value.trim();
+
+        try {
+          document.getElementById("user-list").innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 20px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i>
+            <p>Searching users...</p>
+          </div>
+        `;
+
+          const response = await fetch(
+            `http://localhost:3000/api/users/search?term=${searchTerm}`
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to search users");
+          }
+
+          const users = await response.json();
+          displayUsers(users);
+        } catch (error) {
+          console.error("Error searching users:", error);
+          document.getElementById("user-list").innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 20px;">
+            <p>Error searching users. Please try again later.</p>
+          </div>
+        `;
+        }
+      }
+
+      // Function to display users
+      function displayUsers(users) {
+        const userList = document.getElementById("user-list");
+        const currentUser = JSON.parse(localStorage.getItem("user")) || {};
+
+        if (users.length === 0) {
+          userList.innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 20px;">
+            <p>No users found.</p>
+          </div>
+        `;
+          return;
+        }
+
+        userList.innerHTML = "";
+
+        users.forEach((user) => {
+          // Skip displaying the current user
+          if (currentUser.id === user._id) return;
+
+          const isFollowing =
+            currentUser.following &&
+            currentUser.following.some((follow) => follow.user === user._id);
+
+          const userCard = document.createElement("div");
+          userCard.className = "user-card";
+          userCard.innerHTML = `
+          <img src="${
+            user.profilePicture || "https://via.placeholder.com/100"
+          }" alt="${user.name}">
+          <h3>${user.name}</h3>
+          <p>${user.bio || "No bio available"}</p>
+          <button class="btn view-profile-btn" onclick="viewProfile('${
+            user._id
+          }')">View Profile</button>
+          ${
+            currentUser.id
+              ? `<button class="btn ${
+                  isFollowing ? "following-btn" : "follow-btn"
+                }" 
+              onclick="toggleFollow(this, '${user._id}')">
+              ${isFollowing ? "Following" : "Follow"}
+            </button>`
+              : ""
+          }
+        `;
+
+          userList.appendChild(userCard);
+        });
+      }
+
+      // Function to view a user's profile
+      function viewProfile(userId) {
+        window.location.href = `profile.html?id=${userId}`;
+      }
+
+      // Function to toggle follow status
+      async function toggleFollow(button, userId) {
+        try {
+          const currentUser = JSON.parse(localStorage.getItem("user"));
+
+          if (!currentUser) {
+            alert("Please log in to follow users");
+            return;
+          }
+
+          const isFollowing = button.classList.contains("following-btn");
+          const endpoint = isFollowing
+            ? `http://localhost:3000/api/users/${userId}/unfollow`
+            : `http://localhost:3000/api/users/${userId}/follow`;
+
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              followerId: currentUser.id,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to update follow status");
+          }
+
+          // Update button appearance
+          if (isFollowing) {
+            button.textContent = "Follow";
+            button.classList.remove("following-btn");
+            button.classList.add("follow-btn");
+          } else {
+            button.textContent = "Following";
+            button.classList.remove("follow-btn");
+            button.classList.add("following-btn");
+          }
+        } catch (error) {
+          console.error("Error toggling follow status:", error);
+          alert("Error updating follow status");
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - socioGen</title>
+    <script
+      src="https://kit.fontawesome.com/97ebdf5864.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" href="- Logo.png" type="x-icon" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+      }
+
+      body {
+        background-color: #f0f2f5;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #4e5dff;
+        color: white;
+      }
+
+      .profile-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: var(--card-color);
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .profile-picture-container {
+        position: relative;
+        margin-right: 20px;
+      }
+
+      .profile-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+      }
+
+      .change-picture {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .profile-info {
+        flex: 1;
+      }
+
+      .profile-info h1 {
+        font-size: 28px;
+        margin-bottom: 5px;
+        color: var(--primary-color);
+      }
+
+      .profile-info p {
+        color: var(--text-light);
+        margin-bottom: 8px;
+      }
+
+      .profile-stats {
+        display: flex;
+        gap: 20px;
+        margin: 15px 0;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-count {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: var(--text-light);
+      }
+
+      .edit-profile,
+      .save-profile {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .cancel-edit {
+        padding: 8px 16px;
+        background-color: #ccc;
+        color: #333;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      .edit-form {
+        display: none;
+        margin-top: 15px;
+      }
+
+      .edit-form.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .form-group textarea {
+        height: 100px;
+        resize: vertical;
+      }
+
+      .tabs {
+        display: flex;
+        margin-top: 30px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+      }
+
+      .tab.active {
+        border-bottom: 3px solid var(--primary-color);
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .tab-content {
+        margin-top: 20px;
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      #file-input {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <h1>socioGen</h1>
+      <div>
+        <a
+          href="index.html"
+          style="color: white; text-decoration: none; margin-right: 15px"
+          >Home</a
+        >
+        <a href="#" id="logout" style="color: white; text-decoration: none"
+          >Logout</a
+        >
+      </div>
+    </div>
+
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-picture-container">
+          <img
+            src="https://via.placeholder.com/150"
+            alt="Profile Picture"
+            class="profile-picture"
+            id="profile-image"
+          />
+          <div class="change-picture" id="change-picture">
+            <i class="fas fa-camera"></i>
+          </div>
+          <input type="file" id="file-input" accept="image/*" />
+        </div>
+        <div class="profile-info">
+          <h1 id="profile-name">Loading...</h1>
+          <p id="profile-email">Loading...</p>
+          <p id="profile-bio">No bio yet</p>
+
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-count">0</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-count">0</div>
+              <div class="stat-label">Followers</div>
+            </div>
+            <div class="stat">
+              <div class="stat-count">0</div>
+              <div class="stat-label">Following</div>
+            </div>
+          </div>
+
+          <button class="edit-profile" id="edit-profile-btn">
+            Edit Profile
+          </button>
+        </div>
+      </div>
+
+      <div class="edit-form" id="edit-form">
+        <div class="form-group">
+          <label for="edit-name">Name</label>
+          <input type="text" id="edit-name" />
+        </div>
+        <div class="form-group">
+          <label for="edit-bio">Bio</label>
+          <textarea id="edit-bio"></textarea>
+        </div>
+        <button class="save-profile" id="save-profile-btn">Save Changes</button>
+        <button class="cancel-edit" id="cancel-edit-btn">Cancel</button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="posts">Posts</div>
+        <div class="tab" data-tab="about">About</div>
+        <div class="tab" data-tab="friends">Friends</div>
+      </div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="posts-tab">
+          <div class="post-box" style="margin-bottom: 20px">
+            <textarea
+              id="newPostText"
+              placeholder="What's on your mind?"
+            ></textarea>
+            <button id="createPostBtn">
+              <i class="fas fa-paper-plane"></i> Post
+            </button>
+            <div style="clear: both"></div>
+          </div>
+          <div id="user-posts" class="feed">
+            <p>No posts yet</p>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="about-tab">
+          <h3>About Me</h3>
+          <p id="about-bio">No information provided yet.</p>
+        </div>
+
+        <div class="tab-pane" id="friends-tab">
+          <h3>Friends</h3>
+          <p>You haven't connected with anyone yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is logged in
+        const userData = JSON.parse(localStorage.getItem("user"));
+        if (!userData) {
+          window.location.href = "Login.html";
+          return;
+        }
+
+        // Display user information
+        document.getElementById("profile-name").textContent = userData.name;
+        document.getElementById("profile-email").textContent = userData.email;
+        if (userData.bio) {
+          document.getElementById("profile-bio").textContent = userData.bio;
+          document.getElementById("about-bio").textContent = userData.bio;
+        }
+        if (
+          userData.profilePicture &&
+          userData.profilePicture !== "default-profile.png"
+        ) {
+          document.getElementById("profile-image").src =
+            userData.profilePicture;
+        }
+
+        // Logout functionality
+        document
+          .getElementById("logout")
+          .addEventListener("click", function () {
+            localStorage.removeItem("user");
+            window.location.href = "Login.html";
+          });
+
+        // Tab functionality
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            // Remove active class from all tabs
+            tabs.forEach((t) => t.classList.remove("active"));
+            // Add active class to clicked tab
+            this.classList.add("active");
+
+            // Hide all tab panes
+            document.querySelectorAll(".tab-pane").forEach((pane) => {
+              pane.classList.remove("active");
+            });
+
+            // Show the corresponding tab pane
+            const tabName = this.getAttribute("data-tab");
+            document.getElementById(`${tabName}-tab`).classList.add("active");
+          });
+        });
+
+        // Edit profile functionality
+        const editProfileBtn = document.getElementById("edit-profile-btn");
+        const saveProfileBtn = document.getElementById("save-profile-btn");
+        const cancelEditBtn = document.getElementById("cancel-edit-btn");
+        const editForm = document.getElementById("edit-form");
+
+        editProfileBtn.addEventListener("click", function () {
+          // Show edit form
+          editForm.classList.add("active");
+
+          // Fill form with current values
+          document.getElementById("edit-name").value = userData.name;
+          document.getElementById("edit-bio").value = userData.bio || "";
+        });
+
+        cancelEditBtn.addEventListener("click", function () {
+          // Hide edit form
+          editForm.classList.remove("active");
+        });
+
+        saveProfileBtn.addEventListener("click", async function () {
+          const newName = document.getElementById("edit-name").value;
+          const newBio = document.getElementById("edit-bio").value;
+
+          if (!newName.trim()) {
+            alert("Name cannot be empty");
+            return;
+          }
+
+          try {
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem("user"));
+
+            // Send update to backend
+            const response = await fetch(
+              "http://localhost:3000/api/users/profile",
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  userId: userData.id,
+                  name: newName,
+                  bio: newBio,
+                }),
+              }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Update localStorage with new user data
+              localStorage.setItem("user", JSON.stringify(data));
+
+              // Update UI
+              document.getElementById("profile-name").textContent = data.name;
+              document.getElementById("profile-bio").textContent =
+                data.bio || "No bio yet";
+              document.getElementById("about-bio").textContent =
+                data.bio || "No information provided yet.";
+
+              // Hide edit form
+              editForm.classList.remove("active");
+
+              alert("Profile updated successfully!");
+            } else {
+              alert("Failed to update profile: " + data.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while updating profile");
+          }
+        });
+
+        // Profile picture change functionality
+        const changeProfilePicture = document.getElementById("change-picture");
+        const fileInput = document.getElementById("file-input");
+
+        changeProfilePicture.addEventListener("click", function () {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            // Size validation - 2MB limit is safer
+            if (file.size > 2 * 1024 * 1024) {
+              alert("File size too large. Please select an image under 2MB.");
+              return;
+            }
+
+            // File type validation
+            if (!file.type.match("image.*")) {
+              alert("Please select an image file.");
+              return;
+            }
+
+            // Show loading indicator
+            document.getElementById("profile-image").style.opacity = "0.5";
+
+            // Use FileReader to create a data URL
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+              try {
+                // Compress the image before sending
+                const img = new Image();
+                img.onload = function () {
+                  const canvas = document.createElement("canvas");
+                  // Scale down the image if it's too large
+                  let width = img.width;
+                  let height = img.height;
+
+                  // Max dimensions
+                  const MAX_WIDTH = 800;
+                  const MAX_HEIGHT = 800;
+
+                  if (width > height) {
+                    if (width > MAX_WIDTH) {
+                      height *= MAX_WIDTH / width;
+                      width = MAX_WIDTH;
+                    }
+                  } else {
+                    if (height > MAX_HEIGHT) {
+                      width *= MAX_HEIGHT / height;
+                      height = MAX_HEIGHT;
+                    }
+                  }
+
+                  canvas.width = width;
+                  canvas.height = height;
+
+                  // Draw and compress
+                  const ctx = canvas.getContext("2d");
+                  ctx.drawImage(img, 0, 0, width, height);
+
+                  // Convert to data URL with reduced quality
+                  const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+
+                  // Preview
+                  document.getElementById("profile-image").src =
+                    compressedDataUrl;
+                  document.getElementById("profile-image").style.opacity = "1";
+
+                  // Get user data
+                  const userData = JSON.parse(localStorage.getItem("user"));
+
+                  console.log("Sending compressed profile picture...");
+
+                  // Send compressed image to server
+                  fetch("http://localhost:3000/api/users/profile-picture", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      userId: userData.id,
+                      profilePictureUrl: compressedDataUrl,
+                    }),
+                  })
+                    .then((response) => {
+                      console.log("Response status:", response.status);
+                      return response.json();
+                    })
+                    .then((data) => {
+                      if (
+                        data.message === "Profile picture updated successfully"
+                      ) {
+                        // Update localStorage
+                        userData.profilePicture = compressedDataUrl;
+                        localStorage.setItem("user", JSON.stringify(userData));
+                        console.log("Profile picture updated successfully");
+                      } else {
+                        console.error("Server error:", data.message);
+                        alert(
+                          "Failed to update profile picture: " + data.message
+                        );
+                        // Revert to previous image
+                        document.getElementById("profile-image").src =
+                          userData.profilePicture ||
+                          "https://via.placeholder.com/150";
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Network error:", error);
+                      alert(
+                        "Network error while updating profile picture. Try using a smaller image."
+                      );
+                      // Revert to previous image
+                      document.getElementById("profile-image").src =
+                        userData.profilePicture ||
+                        "https://via.placeholder.com/150";
+                    });
+                };
+
+                // Load the image from data URL
+                img.src = e.target.result;
+              } catch (err) {
+                console.error("Error processing image:", err);
+                alert("Error processing the image. Please try another one.");
+                document.getElementById("profile-image").style.opacity = "1";
+              }
+            };
+
+            reader.onerror = function () {
+              console.error("File reader error");
+              alert("Error reading file. Please try another image.");
+              document.getElementById("profile-image").style.opacity = "1";
+            };
+
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Fetch user posts (this would be connected to your backend in a real app)
+        // For now we'll just show placeholder content
+        fetchUserPosts(userData.id);
+      });
+
+      async function fetchUserPosts(userId) {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/posts/user/${userId}`
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch posts");
+          }
+
+          const posts = await response.json();
+          const postsContainer = document.getElementById("user-posts");
+
+          if (posts.length === 0) {
+            postsContainer.innerHTML = "<p>No posts yet</p>";
+            return;
+          }
+
+          postsContainer.innerHTML = "";
+
+          posts.forEach((post) => {
+            const date = new Date(post.date);
+            const formattedDate =
+              date.toLocaleDateString() +
+              " at " +
+              date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+            // Check if the user already liked this post
+            const isLiked = post.likes.some((like) => like.user === userId);
+            const likeButtonClass = isLiked ? "liked" : "";
+            const heartIcon = isLiked ? "fas" : "far";
+
+            const postHtml = `
+              <div class="post" data-post-id="${post._id}">
+                <h3>${post.user.name}</h3>
+                <span style="color: #888; font-size: 12px;">${formattedDate}</span>
+                <p>${post.text}</p>
+                ${
+                  post.image
+                    ? `<img src="http://localhost:3000${post.image}" alt="Post image" style="max-width: 100%; margin-top: 10px; border-radius: 8px;">`
+                    : ""
+                }
+                <div class="post-actions">
+                  <button onclick="likePost(this, '${
+                    post._id
+                  }')" class="like-btn ${likeButtonClass}">
+                    <i class="${heartIcon} fa-heart"></i> ${post.likes.length}
+                  </button>
+                  <button onclick="toggleComments('${post._id}')">
+                    <i class="far fa-comment"></i> ${post.comments.length}
+                  </button>
+                  <button>
+                    <i class="fas fa-share"></i> Share
+                  </button>
+                </div>
+                <div class="comments-section" id="comments-${
+                  post._id
+                }" style="display: none; margin-top: 15px;">
+                  <div class="comments-list">
+                    ${post.comments
+                      .map((comment) => {
+                        const commentDate = new Date(comment.date);
+                        const formattedCommentDate =
+                          commentDate.toLocaleDateString();
+                        return `
+                        <div class="comment" style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                          <strong>${comment.user.name}</strong> <span style="color: #888; font-size: 12px;">${formattedCommentDate}</span>
+                          <p style="margin-top: 5px;">${comment.text}</p>
+                        </div>
+                      `;
+                      })
+                      .join("")}
+                  </div>
+                  <div class="add-comment" style="margin-top: 10px;">
+                    <textarea id="comment-text-${
+                      post._id
+                    }" placeholder="Write a comment..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    <button onclick="addComment('${
+                      post._id
+                    }')" style="margin-top: 5px;">Comment</button>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            postsContainer.innerHTML += postHtml;
+          });
+        } catch (error) {
+          console.error("Error fetching posts:", error);
+          document.getElementById("user-posts").innerHTML =
+            "<p>Error loading posts. Please try again later.</p>";
+        }
+      }
+
+      function likePost(button, postId) {
+        // Get user data
+        const userData = JSON.parse(localStorage.getItem("user"));
+
+        // Toggle liked state
+        const isLiked = button.classList.contains("liked");
+        const action = isLiked ? "unlike" : "like";
+
+        // Send request to backend
+        fetch(`http://localhost:3000/api/posts/${postId}/like`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userData.id,
+            action: action,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Update UI based on response
+            button.classList.toggle("liked");
+
+            // Update icon and text
+            const icon = button.querySelector("i");
+            if (button.classList.contains("liked")) {
+              icon.classList.remove("far");
+              icon.classList.add("fas");
+            } else {
+              icon.classList.remove("fas");
+              icon.classList.add("far");
+            }
+
+            // Update like count
+            button.innerHTML = `<i class="${
+              button.classList.contains("liked") ? "fas" : "far"
+            } fa-heart"></i> ${data.likes}`;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Failed to update like status");
+          });
+      }
+
+      // Add functions for comments
+      function toggleComments(postId) {
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        if (commentsSection.style.display === "none") {
+          commentsSection.style.display = "block";
+        } else {
+          commentsSection.style.display = "none";
+        }
+      }
+
+      function addComment(postId) {
+        const commentText = document.getElementById(
+          `comment-text-${postId}`
+        ).value;
+
+        if (!commentText.trim()) {
+          alert("Comment cannot be empty");
+          return;
+        }
+
+        // Get user data
+        const userData = JSON.parse(localStorage.getItem("user"));
+
+        // Send request to backend
+        fetch(`http://localhost:3000/api/posts/${postId}/comment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userData.id,
+            text: commentText,
+          }),
+        })
+          .then((response) => response.json())
+          .then((comments) => {
+            // Clear comment input
+            document.getElementById(`comment-text-${postId}`).value = "";
+
+            // Update comment count
+            const commentButton = document.querySelector(
+              `div[data-post-id="${postId}"] .post-actions button:nth-child(2)`
+            );
+            commentButton.innerHTML = `<i class="far fa-comment"></i> ${comments.length}`;
+
+            // Update comments list
+            const commentsList = document.querySelector(
+              `#comments-${postId} .comments-list`
+            );
+            commentsList.innerHTML = comments
+              .map((comment) => {
+                const commentDate = new Date(comment.date);
+                const formattedCommentDate = commentDate.toLocaleDateString();
+                return `
+              <div class="comment" style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                <strong>${comment.user.name}</strong> <span style="color: #888; font-size: 12px;">${formattedCommentDate}</span>
+                <p style="margin-top: 5px;">${comment.text}</p>
+              </div>
+            `;
+              })
+              .join("");
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Failed to add comment");
+          });
+      }
+
+      document
+        .getElementById("createPostBtn")
+        .addEventListener("click", async function () {
+          const postText = document.getElementById("newPostText").value;
+
+          if (!postText.trim()) {
+            alert("Post cannot be empty");
+            return;
+          }
+
+          const userData = JSON.parse(localStorage.getItem("user"));
+
+          try {
+            const response = await fetch("http://localhost:3000/api/posts", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: userData.id,
+                text: postText,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to create post");
+            }
+
+            // Clear post input
+            document.getElementById("newPostText").value = "";
+
+            // Refresh posts
+            fetchUserPosts(userData.id);
+
+            alert("Post created successfully!");
+          } catch (error) {
+            console.error("Error creating post:", error);
+            alert("Failed to create post");
+          }
+        });
+    </script>
+  </body>
+</html>
